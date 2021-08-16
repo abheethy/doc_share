@@ -1,0 +1,35 @@
+#Example 1. Docker Agent, Declarative Pipeline
+pipeline {
+    agent { docker 'maven:3-alpine' } 
+    stages {
+        stage('Example Build') {
+            steps {
+                sh 'mvn -B clean verify'
+            }
+        }
+    }
+}
+#Execute all the steps defined in this Pipeline within a newly created container of the given name and tag (maven:3-alpine).
+#Example 2. Stage-level Agent Section
+pipeline {
+    agent none 
+    stages {
+        stage('Example Build') {
+            agent { docker 'maven:3-alpine' } 
+            steps {
+                echo 'Hello, Maven'
+                sh 'mvn --version'
+            }
+        }
+        stage('Example Test') {
+            agent { docker 'openjdk:8-jre' } 
+            steps {
+                echo 'Hello, JDK'
+                sh 'java -version'
+            }
+        }
+    }
+}
+#Defining agent none at the top-level of the Pipeline ensures that an Executor will not be assigned unnecessarily. Using agent none also forces each stage section to contain its own agent section.
+#Execute the steps in this stage in a newly created container using this image.
+#Execute the steps in this stage in a newly created container using a different image from the previous stage.

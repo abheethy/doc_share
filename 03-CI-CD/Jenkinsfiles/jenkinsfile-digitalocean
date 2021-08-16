@@ -1,0 +1,15 @@
+
+node ('ansibleser') {
+stage ('scm checkout'){
+checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[url: 'https://github.com/ganeshhp/provision-digiocean.git']]]
+}
+stage ('provision droplet') {
+ansiblePlaybook credentialsId: '65af4375-deb3-4125-ae0d-7974246a4d45', inventory: 'hosts', playbook: 'digitalocean.yml'
+}
+stage ('update inventoryfile') {
+sh '''sudo curl -X GET "https://api.digitalocean.com/v2/droplets" \\ -H "Authorization: Bearer $TOKEN" > inventory.yml'''
+}
+stage ('deploy') {
+sh ‘sudo ansible-plabook playbook.yml’
+}
+}

@@ -1,0 +1,20 @@
+node('Jnode1'){
+    
+    stage ('scm checkout') {
+    git 'https://github.com/ganeshhp/helloworldweb.git'
+    }
+    
+    stage ('build') {
+    sh 'mvn -f pom.xml clean package'
+    }
+    
+    stage ('deploy') {
+    sh '''sudo cp /home/vagrant/jenkins/workspace/workspace/build070117/target/*.war /opt/tomcat/apache-tomcat-7.0.78/webapps/
+    sudo sh /opt/tomcat/apache-tomcat-7.0.78/bin/shutdown.sh
+    sudo sh /opt/tomcat/apache-tomcat-7.0.78/bin/startup.sh'''
+    
+    }
+    stage ('archive') {
+    archiveArtifacts 'target/*.war'
+    }
+}

@@ -1,0 +1,25 @@
+
+
+node {
+    
+  stage ('scm_chckout') {        
+	checkout([$class: 'GitSCM', 
+		branches: [[name: '*/master']], 
+		doGenerateSubmoduleConfigurations: false, 
+		extensions: [], submoduleCfg: [], 
+		userRemoteConfigs: [[url: 'https://github.com/ganeshhp/helloworldweb.git']]])
+  }
+  stage ('build') {
+	bat label: '', script: 'mvn clean package'
+  }
+
+  input 'Proceed with Archival?'
+  
+  emailext body: 'test', 
+    subject: 'test', 
+	to: 'ganeshhp@gmail.com'
+  
+  stage ('archive') {
+	archiveArtifacts 'target/petclinic.war'
+  }
+}

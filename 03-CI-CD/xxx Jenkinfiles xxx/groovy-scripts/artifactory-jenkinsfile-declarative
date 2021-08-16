@@ -1,0 +1,22 @@
+def server = Artifactory.newServer url: 'http://35.228.97.16:8081/artifactory', username: 'replacewithusername', password: 'replacewithpasswd'
+
+def downloadSpec = """{
+ "files": [
+  {
+      "pattern": "petclinic/*.war",
+      "target": "petclinic/"
+    }
+ ]
+}"""
+
+server.download(downloadSpec)
+
+def uploadSpec = """{
+  "files": [
+    {
+      "pattern": "target/petclinic.war",
+      "target": "petclinic/"
+    }
+ ]
+}"""
+server.upload(uploadSpec)
