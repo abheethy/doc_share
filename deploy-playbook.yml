@@ -1,0 +1,27 @@
+- name: download package
+  hosts:
+  tasks:
+
+  - name: clear environment-delete package
+    file:
+
+  - name: download file from artifactory
+    command:
+
+  - name: update file mode
+    file:
+
+- name: deploy package to tomcat
+  hosts: appservers
+  tasks:
+
+
+  - name: rename existing package
+    file:
+
+  - name: deploy new pakcage to tomcat
+    copy:
+
+  - name: restart tomcat server
+    service:
+
