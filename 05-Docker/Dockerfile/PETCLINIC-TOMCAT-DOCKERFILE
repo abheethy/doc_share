@@ -1,0 +1,4 @@
+FROM tomcat:latest
+MAINTAINER ganeshhp@gmail.com
+
+ADD ./petclinic.war $CATALINA_HOME/webapps/

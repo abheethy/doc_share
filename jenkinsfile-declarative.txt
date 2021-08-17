@@ -1,0 +1,35 @@
+pipeline { 
+    agent any 
+    stages {
+        agent ( lable 'master')
+        stage('SCM_Chekout') { 
+            steps { 
+                checkout([$class: 'GitSCM', 
+                    branches: [[name: '*/master']], 
+                    doGenerateSubmoduleConfigurations: false, 
+                    extensions: [], 
+                    submoduleCfg: [], 
+                    userRemoteConfigs: [[url: 'https://github.com/ganeshhp/helloworldweb.git']]])
+            }
+        }
+        agent (lable 'master')
+        stage('Build'){
+            steps {
+               bat label: '', script: 'mvn clean package' 
+            }
+        }
+        agent (lable 'master')
+        stage('Archive') {
+            steps {
+                archiveArtifacts 'target/*.war'
+            }
+
+        agent (lable 'appserver')
+        stage ('deploy') {
+            steps {
+                sh 'cp target/*.war /opt/tomcat/webapps/
+            }
+         }
+        }
+    }
+}
