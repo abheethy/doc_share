@@ -1,0 +1,17 @@
+---
+- hosts: localhost
+  connection: local
+  become: yes
+  tasks:
+  - name: installation
+    apt: name={{ item }} state=latest update_cache=yes
+    loop: [ 'apt-transport-https', 'ca-certificates', 'curl', 'software-properties-common', 'python3-pip', 'virtualenv', 'python3-setuptools', 'docker-ce']
+
+  - name: Create default containers
+    docker_container:
+      name: container1
+      image: httpd:latest
+      state: present
+      ports:
+      - "8080:8090"
+    with_sequence: count=2

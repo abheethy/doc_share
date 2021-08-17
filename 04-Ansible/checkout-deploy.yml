@@ -1,0 +1,27 @@
+- name: git checkout
+  hosts: localhost
+  connection: local
+  become: true
+  gather_facts: false
+
+  tasks:
+  - name: Git checkout
+    ansible.builtin.git:
+      repo: 'https://github.com/ganeshhp/helloworldweb.git'
+      dest: /home/vagrant/ansible/package
+
+- name: deploy to tomcat
+  hosts: appserver
+  become: true
+  gather_facts: false
+
+  tasks:
+  - name: remove existing file
+    file:
+      path: /opt/tomcat/webapps/Helloworldwebapp-dev.war
+      state: absent
+
+  - name: deploy package
+    copy:
+      src: package/target/Helloworldwebapp-dev.war
+      dest: /opt/tomcat/webapps/

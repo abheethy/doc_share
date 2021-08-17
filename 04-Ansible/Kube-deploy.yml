@@ -1,0 +1,10 @@
+---
+- hosts: kubemaster
+  remote_user: ubuntu
+  become: false
+  gather_facts: false
+  tasks:
+  - name: deploy app to kube cluster
+    command: kubectl apply -f deployment.yml
+  - name: deploy service object to kube cluster
+    command: kubectl apply -f service.yml

@@ -1,0 +1,52 @@
+---
+
+- name: manage webserver
+  hosts: webserver
+  remote_user: ec2-user
+  gather_facts: false
+  become: true
+  vars:
+        package_name: httpd
+        service_name: httpd
+
+  handlers:
+
+  - name: restart_webservice
+    service:
+        name: "{{service_name}}"
+        state: restarted
+
+  tasks:
+
+  - name: manage package
+    package:
+        name: "{{package_name}}"
+        state: present
+
+  - name: manage service
+    service:
+        name: "{{service_name}}"
+        state: started
+
+  - name: deploy site
+    copy:
+        src: ./index.html
+        dest: /var/www/html/index.html
+    notify:
+        restart_webservice
+
+
+- name: manage users
+  hosts: dbserver
+  remote_user: ubuntu
+  gather_facts: true
+  become: true
+  vars:
+        user_name: user1
+
+  tasks:
+
+  - name: create users
+    user:
+        name: "{{user_name}}"
+        state: present

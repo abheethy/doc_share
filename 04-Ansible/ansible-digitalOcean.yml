@@ -1,0 +1,63 @@
+- hosts: localhost
+
+  vars:
+    do_token: <update your token here>
+    droplets:
+    - droplet-one
+    - droplet-two
+
+  tasks:
+  - name: ensure ssh key exists
+    user: >
+      name={{ ansible_user_id }}
+      generate_ssh_key=yes
+      ssh_key_file=.ssh/id_rsa
+
+  - name: ensure key exists at DigitalOcean
+    digital_ocean: >
+      state=present
+      command=ssh
+      name=my_ssh_key
+      ssh_pub_key={{ lookup('file', '~/.ssh/id_rsa.pub') }}
+      api_token={{ do_token }}
+    register: my_ssh_key
+
+  - name: ensure droplets exist
+    digital_ocean: >
+      state=absent
+      command=droplet
+      name={{ item }}
+      unique_name=yes
+      size_id=512mb
+      region_id=blr1
+      image_id=ubuntu-14-04-x64
+      ssh_key_ids={{ my_ssh_key.ssh_key.id }}
+      api_token={{ do_token }}
+    with_items: "{{ droplets }}"
+    register: droplet_details
+
+
+
+# or to make it consise arguments can be written on one line,
+
+---
+- 
+  hosts: localhost
+  tasks:
+    -
+      name: "ensure ssh key exists"
+      user: "name={{ ansible_user_id }} generate_ssh_key=yes ssh_key_file=.ssh/id_rsa\n"
+    -
+      digital_ocean: "state=present command=ssh name=my_ssh_key ssh_pub_key={{ lookup('file', '~/.ssh/id_rsa.pub') }} api_token={{ do_token }}\n"
+      name: "ensure key exists at DigitalOcean"
+      register: my_ssh_key
+    -
+      digital_ocean: "state=absent command=droplet name={{ item }} unique_name=yes size_id=512mb region_id=blr1 image_id=ubuntu-14-04-x64 ssh_key_ids={{ my_ssh_key.ssh_key.id }} api_token={{ do_token }}\n"
+      name: "ensure droplets exist"
+      register: droplet_details
+      with_items: "{{ droplets }}"
+  vars:
+    do_token: "<update your token here>"
+    droplets:
+      - droplet-one
+      - droplet-two
