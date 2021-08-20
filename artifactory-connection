@@ -1,0 +1,1 @@
+curl -uuser1:AP2tXv3LMf5WVPWuRUdGVHCCa4B -T target/Helloworldwebapp-dev.war "https://pluforum.jfrog.io/artifactory/webapp-sample/Helloworldwebapp-dev.war"
