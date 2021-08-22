@@ -7,11 +7,11 @@ echo "127.0.0.0 k8s-master" >> /etc/hosts
 setenforce 0
 sed -i --follow-symlinks 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/sysconfig/selinux
 
-# apply firewall rule
+# install firewalld service
 yum install firewalld -y
 systemctl enable firewalld
 systemctl start firewalld
-
+# apply firewall rule
 firewall-cmd --permanent --add-port=6443/tcp
 firewall-cmd --permanent --add-port=2379-2380/tcp
 firewall-cmd --permanent --add-port=10250/tcp
@@ -42,6 +42,24 @@ gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cl
 EOF
 
 # install kube components
+cat > /etc/docker/daemon.json <<EOF
+{
+  "exec-opts": ["native.cgroupdriver=systemd"],
+  "log-driver": "json-file",
+  "log-opts": {
+    "max-size": "100m"
+  },
+  "storage-driver": "overlay2",
+  "storage-opts": [
+    "overlay2.override_kernel_check=true"
+  ]
+}
+EOF
+
+mkdir -p /etc/systemd/system/docker.service.d
+
+systemctl daemon-reload
+systemctl restart docker
 
 yum update -y
 yum install kubeadm -y
@@ -54,8 +72,13 @@ kubeadm init --ignore-preflight-errors=all
 mkdir -p $HOME/.kube
 cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 chown $(id -u):$(id -g) $HOME/.kube/config
-
 export kubever=$(kubectl version | base64 | tr -d '\n')
+
+# deploy networking service in Cluster
 kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"
+
 # validate kube cluster components
 kubectl get nodes
+
+# Taint Master node 
+kubectl taint nodes --all node-role.kubernetes.io/master-  
