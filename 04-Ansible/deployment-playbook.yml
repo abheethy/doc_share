@@ -1,0 +1,33 @@
+---
+
+- name: download WAR package
+  hosts: localhost
+  connection: local
+  become: true
+  gather_facts: false
+
+  tasks:
+  - name: clean the workspace
+    file:
+      path: ./petclinic.war
+      state: absent
+
+  - name: Download from artifactory
+    command:
+
+- name: deploy WAR package
+  hosts: appservers
+  remote_user: centos
+  become: true
+  gather_facts: false
+
+  tasks:
+  - name: clean workspace
+    command:
+
+  - name: deployment of WAR
+    copy:
+
+  - name: start Appserver
+    Service:
+
