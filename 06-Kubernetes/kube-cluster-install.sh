@@ -77,6 +77,9 @@ export kubever=$(kubectl version | base64 | tr -d '\n')
 # deploy networking service in Cluster
 kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"
 
+# deploy dashboard
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.3.1/aio/deploy/recommended.yaml
+
 # validate kube cluster components
 kubectl get nodes
 
